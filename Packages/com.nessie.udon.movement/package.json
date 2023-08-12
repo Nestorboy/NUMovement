@@ -1,7 +1,7 @@
 {
   "name": "com.nessie.udon.movement",
   "displayName": "NUMovement",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Prefab and base behaviour for implementing your own custom character controllers in VRChat",
   "gitDependencies": {},
   "author": {
