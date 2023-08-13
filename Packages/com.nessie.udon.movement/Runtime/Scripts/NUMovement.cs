@@ -597,6 +597,9 @@ namespace Nessie.Udon.Movement
         }
 
         [PublicAPI]
+        public bool _IsPlayerGrounded() => IsWalkable;
+
+        [PublicAPI]
         public void _AddForce(Vector3 force)
         {
             Velocity += force;
