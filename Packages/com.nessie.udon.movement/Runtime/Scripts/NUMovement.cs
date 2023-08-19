@@ -6,6 +6,7 @@ using VRC.SDKBase;
 namespace Nessie.Udon.Movement
 {
     [RequireComponent(typeof(CharacterController))]
+    [AddComponentMenu("Nessie/Movement/NUMovement")]
     public class NUMovement : AbstractMovement
     {
         [SerializeField] private bool isActive = true;

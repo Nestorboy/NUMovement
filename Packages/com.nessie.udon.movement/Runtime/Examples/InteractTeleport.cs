@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Nessie.Udon.Movement
 {
-    [AddComponentMenu("")]
+    [AddComponentMenu("Nessie/Movement/Examples/Interact Teleport")]
     public class InteractTeleport : UdonSharpBehaviour
     {
         [SerializeField] private NUMovement movement;

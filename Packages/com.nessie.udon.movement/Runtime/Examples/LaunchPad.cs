@@ -2,7 +2,7 @@
 
 namespace Nessie.Udon.Movement
 {
-    [AddComponentMenu("")]
+    [AddComponentMenu("Nessie/Movement/Examples/Launch Pad")]
     public class LaunchPad : AbstractMovementCollider
     {
         [SerializeField] private Transform launchTarget;
