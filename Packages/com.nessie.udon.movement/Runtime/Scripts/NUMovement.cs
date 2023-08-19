@@ -490,6 +490,12 @@ namespace Nessie.Udon.Movement
         }
         
         [PublicAPI]
+        public void _Respawn(int spawnsIndex)
+        {
+            LocalPlayer.Respawn(spawnsIndex);
+        }
+        
+        [PublicAPI]
         public void _SetPosition(Vector3 position)
         {
             transform.position = position;
