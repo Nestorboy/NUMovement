@@ -269,7 +269,7 @@ namespace Nessie.Udon.Movement
         {
             if (InVR)
             {
-                MotionOffset = GetVROffset(); // Don't affect velocity.
+                MotionOffset += GetVROffset(); // Don't affect velocity.
             }
             
             if (HoldMove)
