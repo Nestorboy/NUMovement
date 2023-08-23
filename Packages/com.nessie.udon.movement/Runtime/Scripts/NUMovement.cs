@@ -59,6 +59,8 @@ namespace Nessie.Udon.Movement
         [SerializeField] protected bool debugDrawer;
         [SerializeField] protected GameObject drawerPrefab;
         
+        [SerializeField, HideInInspector] private BoxCollider groundedCollider;
+        
         // Motion
         [PublicAPI] protected Vector3 Velocity;
         [PublicAPI] protected Vector3 MotionOffset;
@@ -76,6 +78,7 @@ namespace Nessie.Udon.Movement
         [PublicAPI] protected bool WasSteep;
         [PublicAPI] protected bool IsWalkable;
         [PublicAPI] protected bool WasWalkable;
+        [PublicAPI] protected bool ForcePlayerGrounded;
         
         [PublicAPI] protected Vector3 GroundUp;
         [PublicAPI] protected Transform GroundTransform;
@@ -97,6 +100,8 @@ namespace Nessie.Udon.Movement
             _SetRunSpeed(runSpeed);
             _SetJumpImpulse(Mathf.Sqrt(jumpHeight * GravityStrength * GravityMagnitude * 2f));
 
+            Physics.IgnoreCollision(Controller, groundedCollider);
+            
             SnapToPlayer();
         }
         
@@ -418,6 +423,9 @@ namespace Nessie.Udon.Movement
                 return;
             }
 
+            // TODO: Figure out if it's possible to keep the player grounded 100% of the time.
+            groundedCollider.enabled = IsGrounded || ForcePlayerGrounded;
+            
             // TODO: Figure out why VRChats collider doesn't fully line up with this one.
             Quaternion rot = LookRotation;
             Vector3 pos = transform.position - rot * LocalPlayPosition * CameraScale;
@@ -605,6 +613,12 @@ namespace Nessie.Udon.Movement
 
         [PublicAPI]
         public bool _IsPlayerGrounded() => IsWalkable;
+
+        [PublicAPI]
+        public bool _GetForceGrounded() => ForcePlayerGrounded;
+
+        [PublicAPI]
+        public void _SetForceGrounded(bool grounded) => ForcePlayerGrounded = grounded;
 
         [PublicAPI]
         public void _AddForce(Vector3 force)
