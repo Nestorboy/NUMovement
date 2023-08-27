@@ -29,6 +29,8 @@ namespace Nessie.Udon.Movement.Editor
 
         private void OnSceneGUI()
         {
+            if (!_hasMovement) return;
+            
             SerializedObject serializedMovement = new SerializedObject(_movement);
             bool shouldSnap = serializedMovement.FindProperty("groundSnap").boolValue;
             if (!shouldSnap) return;
