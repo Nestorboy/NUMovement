@@ -18,7 +18,6 @@ namespace Nessie.Udon.Movement
         protected const float CROUCH_SPEED_MULTIPLIER = 0.5f;
         protected const float PRONE_SPEED_MULTIPLIER = 0.1f;
 
-        [SerializeField] protected AvatarScalingWrapper avatarScalingWrapper;
         [SerializeField] protected Transform audioListenerScale;
         
         // Constants

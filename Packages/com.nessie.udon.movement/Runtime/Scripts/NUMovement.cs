@@ -9,6 +9,8 @@ namespace Nessie.Udon.Movement
     [AddComponentMenu("Nessie/Movement/NUMovement")]
     public class NUMovement : AbstractMovement
     {
+        [SerializeField] private BoxCollider groundedCollider;
+
         [SerializeField] private bool isActive = true;
 
         [Header("Misc")]
@@ -59,8 +61,6 @@ namespace Nessie.Udon.Movement
         [SerializeField] protected bool debugDrawer;
         [SerializeField] protected GameObject drawerPrefab;
         
-        [SerializeField, HideInInspector] private BoxCollider groundedCollider;
-        
         // Motion
         [PublicAPI] protected Vector3 Velocity;
         [PublicAPI] protected Vector3 MotionOffset;
@@ -101,6 +101,7 @@ namespace Nessie.Udon.Movement
             _SetJumpImpulse(Mathf.Sqrt(jumpHeight * GravityStrength * GravityMagnitude * 2f));
 
             Physics.IgnoreCollision(Controller, groundedCollider);
+            CollisionMask = CollisionMask & ~(1 << groundedCollider.gameObject.layer);
             
             SnapToPlayer();
         }
@@ -423,18 +424,22 @@ namespace Nessie.Udon.Movement
                 return;
             }
 
+            Vector3 transformPos = transform.position;
+            
             // TODO: Figure out if it's possible to keep the player grounded 100% of the time.
-            groundedCollider.enabled = IsGrounded || ForcePlayerGrounded;
+            bool enableGroundCollider = IsGrounded || ForcePlayerGrounded;
+            groundedCollider.enabled = enableGroundCollider;
+            groundedCollider.center = transformPos;
             
             // TODO: Figure out why VRChats collider doesn't fully line up with this one.
             Quaternion rot = LookRotation;
-            Vector3 pos = transform.position - rot * LocalPlayPosition * CameraScale;
+            Vector3 pos = transformPos - rot * LocalPlayPosition * CameraScale;
             var orientation = InVR ? VRC_SceneDescriptor.SpawnOrientation.AlignRoomWithSpawnPoint : VRC_SceneDescriptor.SpawnOrientation.Default;
             LocalPlayer.TeleportTo(pos + ControllerDown * Controller.skinWidth, rot, orientation, true);
 
             bool playerIsMoving = Velocity.magnitude > 0.01f;
             bool groundIsMoving = GroundVelocity.magnitude > 0.01f;
-            if (playerIsMoving || groundIsMoving)
+            if (playerIsMoving && !enableGroundCollider || IsSteep || groundIsMoving)
             {
                 var vel = Velocity / AvatarHeight;
                 if (IsGrounded)
