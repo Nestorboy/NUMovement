@@ -439,11 +439,9 @@ namespace Nessie.Udon.Movement
 
             bool playerIsMoving = Velocity.magnitude > 0.01f;
             bool groundIsMoving = GroundVelocity.magnitude > 0.01f;
-            if (playerIsMoving && !enableGroundCollider || IsSteep || groundIsMoving)
+            if (playerIsMoving && !IsGrounded || IsSteep || groundIsMoving)
             {
                 var vel = Velocity / AvatarHeight;
-                if (IsGrounded)
-                    vel.y = 0f; // Any good way to make sure the regular ground check doesn't fail?
                 if (InVR && groundIsMoving)
                     vel += GetVROffset() / DeltaTime;
 
