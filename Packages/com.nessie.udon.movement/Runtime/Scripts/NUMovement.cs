@@ -27,7 +27,7 @@ namespace Nessie.Udon.Movement
         [Tooltip("The speed used when walking forward in vr or running in desktop mode.")]
         [SerializeField] protected float runSpeed = 4f;
         [Tooltip("The limit for how steep a surface can be before the user slides down.")]
-        [SerializeField] [Min(0f)] protected float slopeLimit = 50f;
+        [SerializeField] [Min(0f)] protected float slopeLimit = 60f;
         [Tooltip("If enabled, the user will snap down to the ground when they become ungrounded and the ground below them is walkable.")]
         [SerializeField] protected bool groundSnap = true;
         [Tooltip("The maximum distance that the user will be able to snap down by.")]
