@@ -9,7 +9,7 @@ namespace Nessie.Udon.Movement
     [RequireComponent(typeof(CharacterController))]
     public abstract class AbstractMovement : UdonSharpBehaviour
     {
-        public const string PACKAGE_VERSION = "0.1.0";
+        public const string PACKAGE_VERSION = "0.2.0";
         
         protected const float VRC_SKIN_WIDTH = 0.005f;
         protected const float VRC_HEIGHT = 1.6f;
