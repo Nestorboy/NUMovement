@@ -517,12 +517,19 @@ namespace Nessie.Udon.Movement
         [PublicAPI]
         public void _TeleportTo(Vector3 position, bool lerpOnRemote = false)
         {
-            Quaternion rotation = LocalPlayer.GetRotation();
-            _TeleportTo(position, rotation, VRC_SceneDescriptor.SpawnOrientation.Default, lerpOnRemote);
+            _TeleportTo(position, LocalPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Origin).rotation, lerpOnRemote);
         }
 
         [PublicAPI]
-        public void _TeleportTo(Vector3 position, Quaternion rotation, VRC_SceneDescriptor.SpawnOrientation orientation = VRC_SceneDescriptor.SpawnOrientation.Default, bool lerpOnRemote = false)
+        public void _TeleportTo(Vector3 position, Quaternion rotation, bool lerpOnRemote = false)
+        {
+            var orientation = InVR ? VRC_SceneDescriptor.SpawnOrientation.AlignRoomWithSpawnPoint : VRC_SceneDescriptor.SpawnOrientation.Default;
+            Vector3 playOffset = LocalPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Origin).position - LocalPlayer.GetPosition();
+            _TeleportTo(position + playOffset, rotation, orientation, lerpOnRemote);
+        }
+        
+        [PublicAPI]
+        public void _TeleportTo(Vector3 position, Quaternion rotation, VRC_SceneDescriptor.SpawnOrientation orientation, bool lerpOnRemote = false)
         {
             LocalPlayer.TeleportTo(position, rotation, orientation, lerpOnRemote);
             SnapToPlayer();
