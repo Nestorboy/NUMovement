@@ -219,11 +219,11 @@ namespace Nessie.Udon.Movement
             //upright = RemapRange(0f, 1f, 0.0365f, 1.005f, upright);
             //PlayerStance = upright > 1f / 1.52f ? Stance.Standing : upright > 1f / 2.48f ? Stance.Crouching : Stance.Prone;
             
+            var originData = LocalPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Origin);
+            PlayRotation = originData.rotation;
             if (InVR)
             {
-                var originData = LocalPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Origin);
                 var headData = LocalPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head);
-                PlayRotation = originData.rotation;
                 Vector3 newPlayPosition = Quaternion.Inverse(PlayRotation) * (headData.position - originData.position) / CameraScale;
                 newPlayPosition.y = 0f; // Ignore vertical offset.
                 LocalPlayPositionDelta = newPlayPosition - LocalPlayPosition;
@@ -242,12 +242,12 @@ namespace Nessie.Udon.Movement
             }
             else
             {
-                InputToWorld = PlayerRotation;
+                InputToWorld = PlayRotation;
             }
 
             if (InputLookEnabled)
             {
-                LookRotation = InVR ? PlayRotation : PlayerRotation;
+                LookRotation = PlayRotation;
             }
         }
 
