@@ -137,6 +137,11 @@ namespace Nessie.Udon.Movement
             Unground();
             
             base.Move(motion);
+            if (!WasGrounded && IsGrounded)
+            {
+                OnGrounded();
+            }
+            
             MotionOffset = Vector3.zero; // Consume.
         }
         
@@ -343,6 +348,7 @@ namespace Nessie.Udon.Movement
                 
                 Vector3 jumpDirection = -GravityDirection;
                 _AddForce(jumpDirection * (JumpImpulse * (scaleMovement ? AvatarHeight : 1f)) - Vector3.Project(Velocity, jumpDirection));
+                OnJumped();
             }
         }
 
@@ -450,6 +456,16 @@ namespace Nessie.Udon.Movement
 
         #endregion Controls
 
+        #region Movement Callbacks
+        
+        [PublicAPI] protected virtual void OnJumped() { }
+        
+        [PublicAPI] protected virtual void OnGrounded() { }
+        
+        [PublicAPI] protected virtual void OnTeleported() { }
+        
+        #endregion Movement Callback
+        
         #region Input Methods
         
         [PublicAPI]
@@ -535,6 +551,7 @@ namespace Nessie.Udon.Movement
         {
             LocalPlayer.TeleportTo(position, rotation, orientation, lerpOnRemote);
             SnapToPlayer();
+            OnTeleported();
         }
 
         [PublicAPI]
