@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using JetBrains.Annotations;
 using VRC.SDKBase;
 
@@ -58,7 +57,7 @@ namespace Nessie.Udon.Movement
         [SerializeField] [Min(0f)] protected float radius = VRC_RADIUS;
 
         [Header("Debug")]
-        [SerializeField] protected bool debugDrawer;
+        [SerializeField] public bool debugDrawer;
         [SerializeField] protected GameObject drawerPrefab;
         
         // Motion
@@ -124,8 +123,8 @@ namespace Nessie.Udon.Movement
             ApplyToPlayer();
 
             Vector3 origin = transform.position;
-            DrawArrow(origin, origin + TransformMovementDirection(Vector3.right), Color.red);
-            DrawArrow(origin, origin + TransformMovementDirection(Vector3.forward), Color.blue);
+            DrawArrow(origin, origin + InputDirectionToMovementDirection(Vector3.right), Color.red);
+            DrawArrow(origin, origin + InputDirectionToMovementDirection(Vector3.forward), Color.blue);
             DrawArrow(origin, origin + Velocity, Color.cyan); // Debug flattened velocity.
             if (IsWalkable)
             {
@@ -298,7 +297,7 @@ namespace Nessie.Udon.Movement
                 Vector3 inputVector = Vector3.ClampMagnitude(new Vector3(InputMoveX, 0f, InputMoveY), 1f) * speedMultiplier;
                 inputVector.x *= strafeSpeed;
                 inputVector.z *= HoldRun ? runSpeed : walkSpeed;
-                Vector3 movementVector = TransformMovementDirection(inputVector);
+                Vector3 movementVector = InputDirectionToMovementDirection(inputVector);
                 if (IsWalkable && !HoldJump)
                 {
                     Velocity = movementVector;
@@ -454,7 +453,7 @@ namespace Nessie.Udon.Movement
         #region Input Methods
         
         [PublicAPI]
-        public void _ControllerEnable()
+        public virtual void _ControllerEnable()
         {
             isActive = true;
             Velocity = LocalPlayer.GetVelocity();
@@ -463,65 +462,68 @@ namespace Nessie.Udon.Movement
         }
 
         [PublicAPI]
-        public void _ControllerDisable()
+        public virtual void _ControllerDisable()
         {
             isActive = false;
         }
 
         [PublicAPI]
-        public void _EnableInputs()
+        public virtual void _EnableInputs()
         {
             _SetCanMove(true);
             _SetCanLook(true);
         }
         
         [PublicAPI]
-        public void _DisableInputs()
+        public virtual void _DisableInputs()
         {
             _SetCanMove(false);
             _SetCanLook(false);
         }
 
         [PublicAPI]
-        public void _SetCanMove(bool canMove)
+        public virtual void _SetCanMove(bool canMove)
         {
             InputMoveEnabled = canMove;
         }
 
         [PublicAPI]
-        public void _SetCanLook(bool canLook) => InputLookEnabled = canLook;
+        public virtual void _SetCanLook(bool canLook)
+        {
+            InputLookEnabled = canLook;
+        }
         
         #endregion Input Methods
 
         #region Player Methods
         
         [PublicAPI]
-        public void _Respawn()
+        public virtual void _Respawn()
         {
             LocalPlayer.Respawn(); // Use OnPlayerRespawn event to set the controller position to the players spawn position.
         }
         
         [PublicAPI]
-        public void _Respawn(int spawnsIndex)
+        public virtual void _Respawn(int spawnsIndex)
         {
             LocalPlayer.Respawn(spawnsIndex);
         }
         
         [PublicAPI]
-        public void _SetPosition(Vector3 position)
+        public virtual void _SetPosition(Vector3 position)
         {
             transform.position = position;
             Physics.SyncTransforms();
         }
 
         [PublicAPI]
-        public void _TeleportTo(Vector3 position, bool lerpOnRemote = false)
+        public virtual void _TeleportTo(Vector3 position, bool lerpOnRemote = false)
         {
             _TeleportTo(position, LocalPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Origin).rotation, lerpOnRemote);
         }
 
         [PublicAPI]
-        public void _TeleportTo(Vector3 position, Quaternion rotation, bool lerpOnRemote = false)
+        public virtual void _TeleportTo(Vector3 position, Quaternion rotation, bool lerpOnRemote = false)
         {
             var orientation = InVR ? VRC_SceneDescriptor.SpawnOrientation.AlignRoomWithSpawnPoint : VRC_SceneDescriptor.SpawnOrientation.Default;
             Vector3 playOffset = LocalPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Origin).position - LocalPlayer.GetPosition();
@@ -529,37 +531,37 @@ namespace Nessie.Udon.Movement
         }
         
         [PublicAPI]
-        public void _TeleportTo(Vector3 position, Quaternion rotation, VRC_SceneDescriptor.SpawnOrientation orientation, bool lerpOnRemote = false)
+        public virtual void _TeleportTo(Vector3 position, Quaternion rotation, VRC_SceneDescriptor.SpawnOrientation orientation, bool lerpOnRemote = false)
         {
             LocalPlayer.TeleportTo(position, rotation, orientation, lerpOnRemote);
             SnapToPlayer();
         }
 
         [PublicAPI]
-        public float _GetGravityStrength() => GravityStrength;
+        public virtual float _GetGravityStrength() => GravityStrength;
 
         [PublicAPI]
-        public void _SetGravityStrength(float strength = 1f)
+        public virtual void _SetGravityStrength(float strength = 1f)
         {
             GravityStrength = strength;
             LocalPlayer.SetGravityStrength(strength);
         }
 
         [PublicAPI]
-        public float _GetGravityMagnitude() => GravityMagnitude * GravityStrength * (scaleMovement ? AvatarHeight : 1f);
+        public virtual float _GetGravityMagnitude() => GravityMagnitude * GravityStrength * (scaleMovement ? AvatarHeight : 1f);
 
         [PublicAPI]
-        public float _GetJumpImpulse() => JumpImpulse;
+        public virtual float _GetJumpImpulse() => JumpImpulse;
 
         [PublicAPI]
-        public void _SetJumpImpulse(float impulse = 3f)
+        public virtual void _SetJumpImpulse(float impulse = 3f)
         {
             JumpImpulse = impulse;
             LocalPlayer.SetJumpImpulse(impulse);
         }
 
         [PublicAPI]
-        public float _GetJumpHeight()
+        public virtual float _GetJumpHeight()
         {
             float gravityMagnitude = _GetGravityMagnitude();
             if (gravityMagnitude == 0f)
@@ -569,52 +571,52 @@ namespace Nessie.Udon.Movement
         }
 
         [PublicAPI]
-        public void _SetJumpHeight(float height)
+        public virtual void _SetJumpHeight(float height)
         {
             _SetJumpImpulse(Mathf.Sqrt(height * _GetGravityMagnitude() * 2f));
         }
 
         [PublicAPI]
-        public float _GetRunSpeed() => RunSpeed;
+        public virtual float _GetRunSpeed() => RunSpeed;
 
         [PublicAPI]
-        public void _SetRunSpeed(float speed = 4f)
+        public virtual void _SetRunSpeed(float speed = 4f)
         {
             RunSpeed = speed;
             LocalPlayer.SetRunSpeed(speed);
         }
 
         [PublicAPI]
-        public float _GetStrafeSpeed() => StrafeSpeed;
+        public virtual float _GetStrafeSpeed() => StrafeSpeed;
 
         [PublicAPI]
-        public void _SetStrafeSpeed(float speed = 2f)
+        public virtual void _SetStrafeSpeed(float speed = 2f)
         {
             StrafeSpeed = speed;
             LocalPlayer.SetStrafeSpeed(speed);
         }
 
         [PublicAPI]
-        public float _GetWalkSpeed() => WalkSpeed;
+        public virtual float _GetWalkSpeed() => WalkSpeed;
 
         [PublicAPI]
-        public void _SetWalkSpeed(float speed = 2f)
+        public virtual void _SetWalkSpeed(float speed = 2f)
         {
             WalkSpeed = speed;
             LocalPlayer.SetWalkSpeed(speed);
         }
 
         [PublicAPI]
-        public Vector3 _GetPosition() => PlayerPosition;
+        public virtual Vector3 _GetPosition() => PlayerPosition;
 
         [PublicAPI]
-        public Quaternion _GetRotation() => PlayerRotation;
+        public virtual Quaternion _GetRotation() => PlayerRotation;
         
         [PublicAPI]
-        public Vector3 _GetVelocity() => Velocity;
+        public virtual Vector3 _GetVelocity() => Velocity;
 
         [PublicAPI]
-        public void _SetVelocity(Vector3 velocity)
+        public virtual void _SetVelocity(Vector3 velocity)
         {
             Velocity = velocity;
             if (Velocity.y >= _GetGravityMagnitude() * DeltaTime)
@@ -622,22 +624,22 @@ namespace Nessie.Udon.Movement
         }
 
         [PublicAPI]
-        public bool _IsPlayerGrounded() => IsWalkable;
+        public virtual bool _IsPlayerGrounded() => IsWalkable;
 
         [PublicAPI]
-        public bool _GetForceGrounded() => ForcePlayerGrounded;
+        public virtual bool _GetForceGrounded() => ForcePlayerGrounded;
 
         [PublicAPI]
-        public void _SetForceGrounded(bool grounded) => ForcePlayerGrounded = grounded;
+        public virtual void _SetForceGrounded(bool grounded) => ForcePlayerGrounded = grounded;
 
         [PublicAPI]
-        public void _AddForce(Vector3 force)
+        public virtual void _AddForce(Vector3 force)
         {
             Velocity += force;
         }
         
         [PublicAPI]
-        public void _TargetVelocity(Vector3 target, float maxDelta)
+        public virtual void _TargetVelocity(Vector3 target, float maxDelta)
         {
             Vector3 movementUp = IsWalkable ? GroundUp : ControllerUp;
             Vector3 flatVelocity = Vector3.ProjectOnPlane(Velocity, movementUp);
@@ -656,7 +658,10 @@ namespace Nessie.Udon.Movement
         
         #endregion Player Methods
 
-        private void InitializeController()
+        #region Utility Methods
+        
+        [PublicAPI]
+        protected void InitializeController()
         {
             if (defaultShape)
             {
@@ -677,7 +682,8 @@ namespace Nessie.Udon.Movement
             Controller.minMoveDistance = 0f; // Why isn't this the default?
         }
         
-        private void SnapToPlayer()
+        [PublicAPI]
+        protected void SnapToPlayer()
         {
             Vector3 playerPos;
             if (InVR)
@@ -705,7 +711,8 @@ namespace Nessie.Udon.Movement
             _SetPosition(playerPos);
         }
         
-        private void Unground()
+        [PublicAPI]
+        protected void Unground()
         {
             WasGrounded = IsGrounded;
             WasSteep = IsSteep;
@@ -715,23 +722,34 @@ namespace Nessie.Udon.Movement
             IsWalkable = false;
         }
         
-        private Vector3 GetVROffset()
+        [PublicAPI]
+        protected Vector3 GetVROffset()
         {
             return PlayRotation * LocalPlayPositionDelta * CameraScale;
         }
         
-        private Vector3 TransformMovementDirection(Vector3 direction)
+        [PublicAPI]
+        protected Vector3 InputDirectionToMovementDirection(Vector3 inputDirection)
         {
-            Vector3 worldDirection = InputToWorld * direction;
+            Vector3 worldDirection = InputToWorld * inputDirection;
+            return WorldDirectionToMovementDirection(worldDirection);
+        }
+
+        [PublicAPI]
+        protected Vector3 WorldDirectionToMovementDirection(Vector3 worldDirection)
+        {
             Plane movementPlane = new Plane(IsWalkable ? GroundUp : ControllerUp, Vector3.zero);
             movementPlane.Raycast(new Ray(worldDirection, ControllerUp), out float distance);
             Vector3 newDirection = (worldDirection + ControllerUp * distance).normalized;
-            return newDirection * direction.magnitude;
+            return newDirection * worldDirection.magnitude;
         }
+        
+        #endregion Utility Methods
 
         #region Debug
 
-        private void DrawLine(Vector3 start, Vector3 end, Color color, float duration = 0f)
+        [PublicAPI]
+        protected void DrawLine(Vector3 start, Vector3 end, Color color, float duration = 0f)
         {
             if (!debugDrawer)
             {
@@ -750,7 +768,8 @@ namespace Nessie.Udon.Movement
             #endif
         }
 
-        private void DrawArrow(Vector3 start, Vector3 end, Color color, float duration = 0f)
+        [PublicAPI]
+        protected void DrawArrow(Vector3 start, Vector3 end, Color color, float duration = 0f)
         {
             if (!debugDrawer)
             {
@@ -787,7 +806,8 @@ namespace Nessie.Udon.Movement
             #endif
         }
         
-        private void DrawCircle(Vector3 center, Vector3 normal, float radius, Color color, float duration = 0f)
+        [PublicAPI]
+        protected void DrawCircle(Vector3 center, Vector3 normal, float radius, Color color, float duration = 0f)
         {
             if (!debugDrawer)
             {
@@ -833,7 +853,7 @@ namespace Nessie.Udon.Movement
         }
 
         #if COMPILER_UDONSHARP && !UNITY_EDITOR
-        private TrailRenderer CreateDrawer()
+        protected TrailRenderer CreateDrawer()
         {
             return Instantiate(drawerPrefab).GetComponent<TrailRenderer>();
         }
