@@ -9,7 +9,7 @@
     "url": "https://github.com/Nestorboy"
   },
   "vpmDependencies": {
-    "com.vrchat.udonsharp": "^1.1.x"
+    "com.vrchat.worlds": "^3.4.0"
   },
   "unity": "2019.4"
 }
