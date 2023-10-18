@@ -535,15 +535,29 @@ namespace Nessie.Udon.Movement
         [PublicAPI]
         public virtual void _TeleportTo(Vector3 position, bool lerpOnRemote = false)
         {
-            _TeleportTo(position, LocalPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Origin).rotation, lerpOnRemote);
+            _TeleportTo(position, LocalPlayer.GetRotation(), lerpOnRemote);
         }
 
         [PublicAPI]
         public virtual void _TeleportTo(Vector3 position, Quaternion rotation, bool lerpOnRemote = false)
         {
-            var orientation = InVR ? VRC_SceneDescriptor.SpawnOrientation.AlignRoomWithSpawnPoint : VRC_SceneDescriptor.SpawnOrientation.Default;
-            Vector3 playOffset = LocalPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Origin).position - LocalPlayer.GetPosition();
-            _TeleportTo(position + playOffset, rotation, orientation, lerpOnRemote);
+            rotation = Quaternion.Euler(0, rotation.eulerAngles.y, 0);
+            
+            Vector3 playerPos = LocalPlayer.GetPosition();
+            Quaternion playerRot = LocalPlayer.GetRotation();
+            Quaternion invPlayerRot = Quaternion.Inverse(playerRot);
+            
+            var originData = LocalPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Origin);
+            Vector3 originPos = originData.position;
+            Quaternion originRot = originData.rotation;
+            
+            Vector3 posOffset = originPos - playerPos;
+            Quaternion rotOffset = invPlayerRot * originRot;
+            
+            Quaternion targetRot = rotation * rotOffset;
+            Vector3 targetPos = position + invPlayerRot * rotation * posOffset;
+            
+            _TeleportTo(targetPos, targetRot, VRC_SceneDescriptor.SpawnOrientation.AlignRoomWithSpawnPoint, lerpOnRemote);
         }
         
         [PublicAPI]
