@@ -10,7 +10,7 @@ namespace Nessie.Udon.Movement
     {
         [SerializeField] private BoxCollider groundedCollider;
 
-        [SerializeField] private bool isActive = true;
+        [SerializeField] protected bool isActive = true;
 
         [Header("Misc")]
         [Tooltip("Determines what the player should inherit from the platform they're standing on.")]
