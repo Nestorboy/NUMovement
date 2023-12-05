@@ -1,6 +1,10 @@
 # NUMovement (Alpha)
 This is an alpha release and parts of code are subject to change based on user feedback. If you use this system, do make sure to bring up suggestions and issues.
 
+### Installation
+Install via [VRChat Creator Companion](https://nestorboy.github.io/Nessie-VPM/)  
+Install via [Unity Package](https://github.com/Nestorboy/NUMovement/releases)
+
 ### Description
 NUMovement is a custom Character Controller implementation designed with the intent of having it be easy to modify and tailor to the worlds specific purpose. The package depends on UdonSharp, and it comes with the NUMovement prefab, a supplementary movement system similar to VRChats, which users should hopefully feel familiar with. The NUMovement system comes with features such as cancelling jumps early, sliding down slopes, moving and rotating with platforms, automatically jumping as long as jump is held down, flight collider prevention and more.
 
