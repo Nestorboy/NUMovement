@@ -541,6 +541,7 @@ namespace Nessie.Udon.Movement
         [PublicAPI]
         public virtual void _TeleportTo(Vector3 position, Quaternion rotation, bool lerpOnRemote = false)
         {
+#if !UNITY_EDITOR
             rotation = Quaternion.Euler(0, rotation.eulerAngles.y, 0);
             
             Vector3 playerPos = LocalPlayer.GetPosition();
@@ -558,6 +559,9 @@ namespace Nessie.Udon.Movement
             Vector3 targetPos = position + invPlayerRot * rotation * posOffset;
             
             _TeleportTo(targetPos, targetRot, VRC_SceneDescriptor.SpawnOrientation.AlignRoomWithSpawnPoint, lerpOnRemote);
+#else //Avoiding problem where ClientSim behaves differently to VRChat
+			_TeleportTo(position, rotation, orientation: VRC_SceneDescriptor.SpawnOrientation.Default, lerpOnRemote);
+#endif
         }
         
         [PublicAPI]
