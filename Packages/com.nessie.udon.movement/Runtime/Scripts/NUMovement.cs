@@ -560,7 +560,7 @@ namespace Nessie.Udon.Movement
             
             _TeleportTo(targetPos, targetRot, VRC_SceneDescriptor.SpawnOrientation.AlignRoomWithSpawnPoint, lerpOnRemote);
 #else //Avoiding problem where ClientSim behaves differently to VRChat
-			_TeleportTo(position, rotation, orientation: VRC_SceneDescriptor.SpawnOrientation.Default, lerpOnRemote);
+            _TeleportTo(position, rotation, orientation: VRC_SceneDescriptor.SpawnOrientation.Default, lerpOnRemote);
 #endif
         }
         
