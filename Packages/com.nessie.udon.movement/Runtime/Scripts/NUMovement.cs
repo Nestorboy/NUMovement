@@ -98,7 +98,7 @@ namespace Nessie.Udon.Movement
             _SetWalkSpeed(walkSpeed);
             _SetStrafeSpeed(strafeSpeed);
             _SetRunSpeed(runSpeed);
-            _SetJumpImpulse(Mathf.Sqrt(jumpHeight * GravityStrength * GravityMagnitude * 2f));
+            _SetJumpHeight(jumpHeight);
 
             Physics.IgnoreCollision(Controller, groundedCollider);
             CollisionMask = CollisionMask & ~(1 << groundedCollider.gameObject.layer);
