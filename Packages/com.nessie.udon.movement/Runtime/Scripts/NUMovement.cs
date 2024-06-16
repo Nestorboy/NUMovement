@@ -284,20 +284,26 @@ namespace Nessie.Udon.Movement
             
             if (HoldMove)
             {
-                float speedMultiplier = scaleMovement ? AvatarHeight : 1f;
+                float speedMultiplier;
                 switch (PlayerStance)
                 {
                     case Stance.Crouching:
                     {
-                        speedMultiplier *= CROUCH_SPEED_MULTIPLIER;
+                        speedMultiplier = CROUCH_SPEED_MULTIPLIER;
                         break;
                     }
                     case Stance.Prone:
                     {
-                        speedMultiplier *= PRONE_SPEED_MULTIPLIER;
+                        speedMultiplier = PRONE_SPEED_MULTIPLIER;
+                        break;
+                    }
+                    default:
+                    {
+                        speedMultiplier = 1f;
                         break;
                     }
                 }
+                if (scaleMovement) speedMultiplier *= AvatarHeight;
                 
                 Vector3 inputVector = Vector3.ClampMagnitude(new Vector3(InputMoveX, 0f, InputMoveY), 1f) * speedMultiplier;
                 inputVector.x *= strafeSpeed;
@@ -309,7 +315,10 @@ namespace Nessie.Udon.Movement
                 }
                 else
                 {
-                    _TargetVelocity(movementVector, 5f * runSpeed * (scaleMovement ? AvatarHeight : 1f) * DeltaTime);
+                    float speed = 5f * runSpeed;
+                    if (scaleMovement) speed *= AvatarHeight;
+                    
+                    _TargetVelocity(movementVector, speed * DeltaTime);
                 }
             }
             else if (GroundTransform && IsWalkable && !HoldJump)
@@ -347,14 +356,20 @@ namespace Nessie.Udon.Movement
                 IsJumping = true;
                 
                 Vector3 jumpDirection = -GravityDirection;
-                _AddForce(jumpDirection * (JumpImpulse * (scaleMovement ? AvatarHeight : 1f)) - Vector3.Project(Velocity, jumpDirection));
+                float jumpImpulse = JumpImpulse;
+                if (scaleMovement) jumpImpulse *= AvatarHeight;
+                
+                _AddForce(jumpDirection * jumpImpulse - Vector3.Project(Velocity, jumpDirection));
                 OnJumped();
             }
         }
 
         protected virtual void ApplyGravity()
         {
-            _AddForce(Gravity * (GravityStrength * (scaleMovement ? AvatarHeight : 1f) * DeltaTime));
+            float gravityStrength = GravityStrength;
+            if (scaleMovement) gravityStrength *= AvatarHeight;
+            
+            _AddForce(Gravity * (gravityStrength * DeltaTime));
         }
         
         protected virtual void ApplyGroundSnap()
@@ -583,7 +598,13 @@ namespace Nessie.Udon.Movement
         }
 
         [PublicAPI]
-        public virtual float _GetGravityMagnitude() => GravityMagnitude * GravityStrength * (scaleMovement ? AvatarHeight : 1f);
+        public virtual float _GetGravityMagnitude()
+        {
+            float gravityStrength = GravityStrength;
+            if (scaleMovement) gravityStrength *= AvatarHeight;
+            
+            return GravityMagnitude * gravityStrength;
+        }
 
         [PublicAPI]
         public virtual float _GetJumpImpulse() => JumpImpulse;
