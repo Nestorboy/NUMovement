@@ -286,7 +286,10 @@ namespace Nessie.Udon.Movement
             }
         }
         
-        private void DetectMenu() // Not perfect, but better than nothing. Breaks if more colliders are introduced or removed.
+        /// <summary>
+        /// Checks if any VRChat menus are currently open. Not perfect, but better than nothing. Breaks if more colliders are introduced or removed.
+        /// </summary>
+        private void DetectMenu()
         {
             int count = Physics.OverlapSphereNonAlloc(PlayerPosition, 10f, _menuColliders, 1 << 19);
             MainMenuOpen = count == 8 || count == 9 || count == 10;
@@ -294,16 +297,25 @@ namespace Nessie.Udon.Movement
             MenuOpen = MainMenuOpen || QuickMenuOpen; // Main Menu: 8, 9, 10 Quick Menu: 11, 12
         }
         
+        /// <summary>
+        /// Checks if movement input is non-zero.
+        /// </summary>
         private void DetectInputMove()
         {
             HoldMove = InputMoveX != 0f || InputMoveY != 0f;
         }
         
+        /// <summary>
+        /// Checks it the player is running. Always true in VR.
+        /// </summary>
         private void DetectInputRun()
         {
             HoldRun = InVR || Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
         }
 
+        /// <summary>
+        /// Checks if look input is non-zero.
+        /// </summary>
         private void DetectInputLook()
         {
             HoldLook = InputLookX != 0f || InputLookY != 0f;
