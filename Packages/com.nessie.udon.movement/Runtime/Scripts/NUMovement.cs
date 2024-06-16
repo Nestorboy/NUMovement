@@ -94,6 +94,7 @@ namespace Nessie.Udon.Movement
         {
             InitializeController();
             
+            // These fields are purely here so we can serialize them.
             _SetWalkSpeed(walkSpeed);
             _SetStrafeSpeed(strafeSpeed);
             _SetRunSpeed(runSpeed);
@@ -306,8 +307,8 @@ namespace Nessie.Udon.Movement
                 if (scaleMovement) speedMultiplier *= AvatarHeight;
                 
                 Vector3 inputVector = Vector3.ClampMagnitude(new Vector3(InputMoveX, 0f, InputMoveY), 1f) * speedMultiplier;
-                inputVector.x *= strafeSpeed;
-                inputVector.z *= HoldRun ? runSpeed : walkSpeed;
+                inputVector.x *= StrafeSpeed;
+                inputVector.z *= HoldRun ? RunSpeed : WalkSpeed;
                 Vector3 movementVector = InputDirectionToMovementDirection(inputVector);
                 if (IsWalkable && !HoldJump)
                 {
@@ -315,7 +316,7 @@ namespace Nessie.Udon.Movement
                 }
                 else
                 {
-                    float speed = 5f * runSpeed;
+                    float speed = 5f * RunSpeed;
                     if (scaleMovement) speed *= AvatarHeight;
                     
                     _TargetVelocity(movementVector, speed * DeltaTime);
