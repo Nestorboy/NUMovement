@@ -510,6 +510,26 @@ namespace Nessie.Udon.Movement
         }
         
         #endregion Input Methods
+        
+        #region Shape Methods
+        
+        [PublicAPI]
+        public void _SetHeight(float height)
+        {
+            Controller.height = height;
+            float realHalfHeight = Mathf.Max(height * 0.5f, Controller.radius);
+            Controller.center = realHalfHeight * ControllerUp;
+        }
+
+        [PublicAPI]
+        public void _SetRadius(float radius)
+        {
+            Controller.radius = radius;
+            float realHalfHeight = Mathf.Max(Controller.height * 0.5f, radius);
+            Controller.center = realHalfHeight * ControllerUp;
+        }
+
+        #endregion Shape Methods
 
         #region Player Methods
         
