@@ -121,6 +121,7 @@ namespace Nessie.Udon.Movement
 
             ApplyGroundSnap();
             ApplyToPlayer();
+            ApplyHeightAdjust();
 
             Vector3 origin = transform.position;
             DrawArrow(origin, origin + InputDirectionToMovementDirection(Vector3.right), Color.red);
@@ -452,6 +453,44 @@ namespace Nessie.Udon.Movement
 
                 LocalPlayer.SetVelocity(vel);
             }
+        }
+
+        protected virtual void ApplyHeightAdjust() // TODO: Clean up.
+        {
+            if (!heightAdjust) return; // Shrink to head height, otherwise sweep check for a ceiling.
+            
+            Vector3 basePos = transform.position;
+            Vector3 headPos = LocalPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position;
+            float diameter = Controller.radius * 2f;
+            float oldHeight = Controller.height + Controller.skinWidth;
+            float playerHeight = Vector3.Dot(headPos - basePos, ControllerUp) * 1.15f; // Add some padding too.
+            float newHeight = playerHeight;
+            float midLength = Mathf.Max(0f, playerHeight - diameter);
+
+            float r = Controller.radius - Controller.skinWidth;
+            if (Physics.SphereCast(
+                    basePos + ControllerUp * Controller.radius,
+                    r,
+                    ControllerUp,
+                    out RaycastHit hit,
+                    midLength,
+                    CollisionMask,
+                    QueryTriggerInteraction.Ignore))
+            {
+                Vector3 maxTopCapPos = hit.point + hit.normal * r;
+                float ceilingHeight = Vector3.Dot(maxTopCapPos - basePos, ControllerUp) + r;
+                if (ceilingHeight < playerHeight)
+                {
+                    newHeight = Mathf.Max(ceilingHeight, oldHeight);
+                }
+            }
+            else
+            {
+                newHeight = playerHeight;
+            }
+
+            PlayerHeight = Mathf.Max(diameter, newHeight - Controller.skinWidth);
+            _SetHeight(PlayerHeight);
         }
 
         #endregion Controls
