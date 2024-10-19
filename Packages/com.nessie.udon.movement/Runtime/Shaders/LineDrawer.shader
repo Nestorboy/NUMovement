@@ -44,9 +44,6 @@
 
     ENDCG
 
-    CGINCLUDE
-    ENDCG
-
     Category
     {
         Tags
