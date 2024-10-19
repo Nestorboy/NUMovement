@@ -45,6 +45,14 @@
         return o;
     }
 
+    fixed4 PostFrag(fixed4 color);
+
+    fixed4 Frag(Varyings i) : SV_Target
+    {
+        fixed4 color = i.color * tex2D(_MainTex, i.texcoord) * i.color.a;
+        return PostFrag(color);
+    }
+
     ENDCG
 
     Category
@@ -81,9 +89,9 @@
                 #pragma vertex Vert
                 #pragma fragment Frag
 
-                fixed4 Frag(Varyings i) : SV_Target
+                fixed4 PostFrag(fixed4 color) : SV_Target
                 {
-                    return i.color * tex2D(_MainTex, i.texcoord) * i.color.a;
+                    return color;
                 }
 
                 ENDCG
@@ -104,9 +112,9 @@
                 #pragma vertex Vert
                 #pragma fragment Frag
 
-                fixed4 Frag(Varyings i) : SV_Target
+                fixed4 PostFrag(fixed4 color) : SV_Target
                 {
-                    return i.color * tex2D(_MainTex, i.texcoord) * i.color.a * 0.1;
+                    return color * 0.1;
                 }
 
                 ENDCG
