@@ -64,6 +64,8 @@
         {
             Pass
             {
+                Name "In Front"
+
                 ZTest LEqual
                 
                 CGPROGRAM
@@ -83,6 +85,8 @@
             
             Pass
             {
+                Name "Behind"
+
                 ZTest Greater
                 
                 CGPROGRAM
