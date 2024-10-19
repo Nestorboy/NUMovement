@@ -10,7 +10,7 @@
 
     #include "UnityCG.cginc"
 
-    struct appdata
+    struct Attributes
     {
         float4 vertex : POSITION;
         fixed4 color : COLOR;
@@ -18,7 +18,7 @@
         UNITY_VERTEX_INPUT_INSTANCE_ID
     };
 
-    struct v2f
+    struct Varyings
     {
         float4 vertex : SV_POSITION;
         fixed4 color : COLOR;
@@ -31,9 +31,9 @@
 
     float4 _MainTex_ST;
 
-    v2f vert (appdata v)
+    Varyings vert (Attributes v)
     {
-        v2f o;
+        Varyings o;
         UNITY_SETUP_INSTANCE_ID(v);
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
         o.vertex = UnityObjectToClipPos(v.vertex);
@@ -77,7 +77,7 @@
                 #pragma target 2.0
                 #pragma multi_compile_particles
     
-                fixed4 frag (v2f i) : SV_Target
+                fixed4 frag (Varyings i) : SV_Target
                 {
                     return i.color * tex2D(_MainTex, i.texcoord) * i.color.a;
                 }
@@ -96,7 +96,7 @@
                 #pragma target 2.0
                 #pragma multi_compile_particles
     
-                fixed4 frag (v2f i) : SV_Target
+                fixed4 frag (Varyings i) : SV_Target
                 {
                     return i.color * tex2D(_MainTex, i.texcoord) * i.color.a * 0.1;
                 }

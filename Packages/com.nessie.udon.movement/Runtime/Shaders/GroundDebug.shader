@@ -34,14 +34,14 @@
 
             #include "UnityCG.cginc"
 
-            struct appdata
+            struct Attributes
             {
                 float4 vertex : POSITION;
                 float3 normal : NORMAL;
                 float2 uv : TEXCOORD0;
             };
 
-            struct v2f
+            struct Varyings
             {
                 float4 vertex : SV_POSITION;
                 nointerpolation float3 normal : NORMAL;
@@ -51,9 +51,9 @@
             sampler2D _MainTex;
             float4 _MainTex_ST;
 
-            v2f vert (appdata v)
+            Varyings vert (Attributes v)
             {
-                v2f o;
+                Varyings o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.normal = UnityObjectToWorldDir(v.normal);
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
@@ -64,7 +64,7 @@
             fixed _GroundAngle;
             fixed4 _InvalidColor, _GroundColor, _WalkableColor;
 
-            fixed4 frag (v2f i) : SV_Target
+            fixed4 frag (Varyings i) : SV_Target
             {
                 fixed4 col = tex2D(_MainTex, i.uv);
                 
