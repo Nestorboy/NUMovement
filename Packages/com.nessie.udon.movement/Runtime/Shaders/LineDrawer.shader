@@ -32,7 +32,7 @@
 
     fixed4 _TintColor;
 
-    Varyings vert(Attributes v)
+    Varyings Vert(Attributes v)
     {
         Varyings o;
         UNITY_SETUP_INSTANCE_ID(v);
@@ -78,10 +78,10 @@
 
                 #pragma multi_compile_particles
 
-                #pragma vertex vert
-                #pragma fragment frag
+                #pragma vertex Vert
+                #pragma fragment Frag
 
-                fixed4 frag(Varyings i) : SV_Target
+                fixed4 Frag(Varyings i) : SV_Target
                 {
                     return i.color * tex2D(_MainTex, i.texcoord) * i.color.a;
                 }
@@ -101,10 +101,10 @@
 
                 #pragma multi_compile_particles
 
-                #pragma vertex vert
-                #pragma fragment frag
+                #pragma vertex Vert
+                #pragma fragment Frag
 
-                fixed4 frag(Varyings i) : SV_Target
+                fixed4 Frag(Varyings i) : SV_Target
                 {
                     return i.color * tex2D(_MainTex, i.texcoord) * i.color.a * 0.1;
                 }
