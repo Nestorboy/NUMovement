@@ -78,6 +78,7 @@ namespace Nessie.Udon.Movement
         [PublicAPI] protected bool IsWalkable;
         [PublicAPI] protected bool WasWalkable;
         [PublicAPI] protected bool ForcePlayerGrounded;
+        [PublicAPI] protected bool WasCenterAboveWalkableGround;
         
         [PublicAPI] protected Vector3 GroundUp;
         [PublicAPI] protected Transform GroundTransform;
@@ -174,7 +175,7 @@ namespace Nessie.Udon.Movement
                     float normalAngle = Vector3.Angle(normal, -GravityDirection);
                     float toFootAngle = Vector3.Angle(point - bottomCapCenter, -GravityDirection);
                     float surfaceAngle = Mathf.Min(normalAngle, toFootAngle);
-                    if (surfaceAngle > slopeLimit)
+                    if (surfaceAngle > slopeLimit && !WasCenterAboveWalkableGround)
                     {
                         IsSteep = true;
                     }
@@ -273,6 +274,26 @@ namespace Nessie.Udon.Movement
                 _AddForce(GroundVelocity);
                 GroundTransform = null;
                 GroundVelocity = Vector3.zero;
+            }
+
+            // TODO: Figure out better location for this.
+            Vector3 basePos = transform.position;
+            float r = Controller.radius;
+            Vector3 origin = basePos + ControllerUp * r;
+            float distance = Controller.stepOffset + Controller.radius + r;
+
+            if (!Physics.Raycast(
+                    origin,
+                    ControllerDown,
+                    out RaycastHit rayHit,
+                    distance,
+                    CollisionMask))
+            {
+                WasCenterAboveWalkableGround = false;
+            }
+            else
+            {
+                WasCenterAboveWalkableGround = Vector3.Angle(rayHit.normal, -GravityDirection) <= slopeLimit;
             }
         }
         
