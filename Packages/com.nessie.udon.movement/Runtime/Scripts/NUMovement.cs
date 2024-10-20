@@ -27,6 +27,8 @@ namespace Nessie.Udon.Movement
         [SerializeField] protected float runSpeed = 4f;
         [Tooltip("The limit for how steep a surface can be before the user slides down.")]
         [SerializeField] [Min(0f)] protected float slopeLimit = 60f;
+        [Tooltip("The maximum height of a step the user is able to walk onto.")]
+        [SerializeField] [Min(0f)] protected float stepHeight = 0.25f;
         [Tooltip("If enabled, the user will snap down to the ground when they become ungrounded and the ground below them is walkable.")]
         [SerializeField] protected bool groundSnap = true;
         [Tooltip("The maximum distance that the user will be able to snap down by.")]
@@ -755,6 +757,7 @@ namespace Nessie.Udon.Movement
                 Controller.height = height;
             }
 
+            Controller.stepOffset = stepHeight;
             Controller.slopeLimit = 180f; // Avoid being unable to walk up steep surfaces, use custom limit instead.
             Controller.minMoveDistance = 0f; // Why isn't this the default?
         }
