@@ -734,7 +734,6 @@ namespace Nessie.Udon.Movement
                 Controller.height = height;
             }
 
-            Controller.stepOffset = 0f; // Step offset is all kinds of jank.
             Controller.slopeLimit = 180f; // Avoid being unable to walk up steep surfaces, use custom limit instead.
             Controller.minMoveDistance = 0f; // Why isn't this the default?
         }
