@@ -123,6 +123,7 @@ namespace Nessie.Udon.Movement
 
             Move(Velocity * DeltaTime + MotionOffset);
 
+            ApplyLedge();
             ApplyGroundSnap();
             ApplyToPlayer();
 
@@ -179,7 +180,7 @@ namespace Nessie.Udon.Movement
                     float normalAngle = Vector3.Angle(normal, -GravityDirection);
                     float toFootAngle = Vector3.Angle(point - bottomCapCenter, -GravityDirection);
                     float surfaceAngle = Mathf.Min(normalAngle, toFootAngle);
-                    if (surfaceAngle > slopeLimit && !WasCenterAboveWalkableGround)
+                    if (surfaceAngle > slopeLimit)
                     {
                         IsSteep = true;
                     }
@@ -279,26 +280,6 @@ namespace Nessie.Udon.Movement
                 GroundTransform = null;
                 GroundVelocity = Vector3.zero;
             }
-
-            // TODO: Figure out better location for this.
-            Vector3 basePos = transform.position;
-            float r = Controller.radius;
-            Vector3 origin = basePos + ControllerUp * r;
-            float distance = Controller.stepOffset + Controller.radius + r;
-
-            if (!Physics.Raycast(
-                    origin,
-                    ControllerDown,
-                    out RaycastHit rayHit,
-                    distance,
-                    CollisionMask))
-            {
-                WasCenterAboveWalkableGround = false;
-            }
-            else
-            {
-                WasCenterAboveWalkableGround = Vector3.Angle(rayHit.normal, -GravityDirection) <= slopeLimit;
-            }
         }
         
         protected virtual void ApplyWalk()
@@ -396,6 +377,35 @@ namespace Nessie.Udon.Movement
             if (scaleMovement) gravityStrength *= AvatarHeight;
             
             _AddForce(Gravity * (gravityStrength * DeltaTime));
+        }
+
+        protected virtual void ApplyLedge()
+        {
+            Vector3 basePos = transform.position;
+            float r = Controller.radius;
+            Vector3 origin = basePos + ControllerUp * r;
+            float distance = Controller.stepOffset + Controller.radius + r;
+
+            if (!Physics.Raycast(
+                    origin,
+                    ControllerDown,
+                    out RaycastHit rayHit,
+                    distance,
+                    CollisionMask))
+            {
+                WasCenterAboveWalkableGround = false;
+            }
+            else
+            {
+                WasCenterAboveWalkableGround = Vector3.Angle(rayHit.normal, -GravityDirection) <= slopeLimit;
+                if (WasCenterAboveWalkableGround && IsGrounded)
+                {
+                    GroundUp = Vector3.up;
+                    IsSteep = false;
+                    IsWalkable = true;
+                    Velocity = Vector3.ProjectOnPlane(Velocity, GroundUp);
+                }
+            }
         }
         
         protected virtual void ApplyGroundSnap()
